@@ -1,0 +1,12 @@
+{
+  "name": "nexo-inventario-ui-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Prueba opcional de la interfaz; la aplicación no necesita Node.js para ejecutarse",
+  "scripts": {
+    "test:ui": "node scripts/smoke-ui.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

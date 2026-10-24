@@ -1,0 +1,10 @@
+CREATE TABLE app_users (id BIGINT AUTO_INCREMENT PRIMARY KEY, email VARCHAR(150) NOT NULL UNIQUE, password VARCHAR(255) NOT NULL, name VARCHAR(100) NOT NULL, role VARCHAR(20) NOT NULL);
+CREATE TABLE categories (id BIGINT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100) NOT NULL UNIQUE, description VARCHAR(255));
+CREATE TABLE suppliers (id BIGINT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100) NOT NULL, email VARCHAR(150), phone VARCHAR(40));
+CREATE TABLE products (id BIGINT AUTO_INCREMENT PRIMARY KEY, sku VARCHAR(60) NOT NULL UNIQUE, name VARCHAR(150) NOT NULL, price DECIMAL(14,2) NOT NULL, stock INT NOT NULL, minimum_stock INT NOT NULL, category_id BIGINT NOT NULL, supplier_id BIGINT NOT NULL, FOREIGN KEY(category_id) REFERENCES categories(id), FOREIGN KEY(supplier_id) REFERENCES suppliers(id), CHECK(stock>=0), CHECK(price>0));
+CREATE TABLE sales (id BIGINT AUTO_INCREMENT PRIMARY KEY, created_at TIMESTAMP(6) NOT NULL, user_id BIGINT NOT NULL, total DECIMAL(14,2) NOT NULL, FOREIGN KEY(user_id) REFERENCES app_users(id));
+CREATE TABLE sale_items (id BIGINT AUTO_INCREMENT PRIMARY KEY, sale_id BIGINT NOT NULL, product_id BIGINT NOT NULL, product_name VARCHAR(255) NOT NULL, quantity INT NOT NULL, unit_price DECIMAL(14,2) NOT NULL, FOREIGN KEY(sale_id) REFERENCES sales(id), FOREIGN KEY(product_id) REFERENCES products(id), CHECK(quantity>0));
+CREATE INDEX idx_products_category ON products(category_id);
+CREATE INDEX idx_products_supplier ON products(supplier_id);
+CREATE INDEX idx_sales_date ON sales(created_at);
+CREATE INDEX idx_items_sale ON sale_items(sale_id);

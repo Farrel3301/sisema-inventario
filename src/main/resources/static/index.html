@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Nexo · Inventario</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <section id="auth" class="auth">
+      <div class="brand-story">
+        <span class="logo">N</span>
+        <p class="eyebrow">NEXO INVENTARIO</p>
+        <h1>Todo tu negocio.<br />En perfecto orden.</h1>
+        <p>Productos, proveedores y ventas conectados en un solo lugar.</p>
+        <div class="story-card">
+          ↗ Controla tus existencias<br /><small
+            >Toma decisiones con información actualizada.</small
+          >
+        </div>
+      </div>
+      <div class="auth-card">
+        <h2 id="auth-title">Bienvenido de nuevo</h2>
+        <p class="muted">Ingresa a tu espacio de trabajo.</p>
+        <form id="auth-form">
+          <label id="name-field" hidden
+            >Nombre<input
+              name="name"
+              maxlength="100"
+              autocomplete="name" /></label
+          ><label
+            >Correo electrónico<input
+              name="email"
+              type="email"
+              required
+              maxlength="150"
+              autocomplete="username" /></label
+          ><label
+            >Contraseña<input
+              name="password"
+              type="password"
+              required
+              maxlength="72"
+              autocomplete="current-password" /></label
+          ><button class="primary" type="submit" id="auth-submit">
+            Iniciar sesión →
+          </button>
+        </form>
+        <button class="text-button" id="toggle-auth">
+          ¿No tienes cuenta? Regístrate
+        </button>
+      </div>
+    </section>
+    <div id="workspace" hidden>
+      <aside>
+        <a class="brand" href="/">
+          <span class="logo">N</span> Nexo<span class="badge">ERP</span></a
+        >
+        <p class="nav-label">ESPACIO DE TRABAJO</p>
+        <nav id="nav"></nav>
+        <div class="sidebar-footer">
+          <span id="user-name"></span><small id="user-role"></small
+          ><button id="logout">Cerrar sesión</button>
+        </div>
+      </aside>
+      <main>
+        <header>
+          <div>
+            <p class="eyebrow">TU NEGOCIO, EN TIEMPO REAL</p>
+            <h1 id="page-title">Resumen general</h1>
+          </div>
+          <span class="status">● Sistema activo</span>
+        </header>
+        <div id="content"></div>
+        <footer>Nexo Inventario · Control simple, decisiones claras.</footer>
+      </main>
+    </div>
+    <div id="toast" role="status" hidden></div>
+    <dialog id="modal">
+      <div class="modal-heading">
+        <h2 id="modal-title"></h2>
+        <button id="close-modal" aria-label="Cerrar">×</button>
+      </div>
+      <form id="editor"></form>
+    </dialog>
+    <script src="/app.js" defer></script>
+  </body>
+</html>

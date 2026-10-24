@@ -1,0 +1,15 @@
+target/
+.env
+*.log
+.idea/
+.cache/
+node_modules/
+test-results/
+
+# Configuración privada y claves locales
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
