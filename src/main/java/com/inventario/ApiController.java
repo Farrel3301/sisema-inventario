@@ -64,7 +64,10 @@ class ApiController {
       @Min(0) @Max(1000000) int stock,
       @Min(0) @Max(1000000) int minimumStock,
       @NotNull Long categoryId,
-      @NotNull Long supplierId) {}
+      @NotNull Long supplierId,
+      @DecimalMin("0.00") @DecimalMax("999999999.99") @Digits(integer = 9, fraction = 2)
+          BigDecimal cost,
+      @Pattern(regexp = "PEN|COP") String currency) {}
 
   record Line(@NotNull Long productId, @Min(1) @Max(1000000) int quantity) {}
 
@@ -177,6 +180,11 @@ class ApiController {
   Product saveProduct(Product p, ProductInput i) {
     p.sku = i.sku().trim();
     p.name = i.name().trim();
+    if (p.id != null && i.currency() != null && !p.currency.equals(i.currency()))
+      throw new ResponseStatusException(
+          HttpStatus.CONFLICT, "La moneda de un producto existente no se puede cambiar");
+    if (i.currency() != null) p.currency = i.currency();
+    if (i.cost() != null) p.cost = i.cost();
     p.price = i.price();
     p.stock = i.stock();
     p.minimumStock = i.minimumStock();

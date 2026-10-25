@@ -12,6 +12,9 @@ public class Sale {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   public Long id;
 
+  @Column(nullable = false, length = 3)
+  public String currency = "PEN";
+
   public Instant createdAt = Instant.now();
 
   @ManyToOne(optional = false)

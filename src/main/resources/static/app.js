@@ -5,6 +5,7 @@ let csrf,
   view = "dashboard",
   register = false,
   data = {};
+let currency = localStorage.getItem("nexo-currency") === "COP" ? "COP" : "PEN";
 const names = {
   dashboard: "Resumen general",
   products: "Productos",
@@ -30,9 +31,20 @@ const esc = (v) =>
       ],
   );
 const money = (n) =>
-  new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP" }).format(
-    n,
-  );
+  new Intl.NumberFormat(currency === "PEN" ? "es-PE" : "es-CO", {
+    style: "currency",
+    currency,
+  }).format(n);
+$("#currency").value = currency;
+$("#currency").onchange = async (e) => {
+  currency = e.target.value;
+  localStorage.setItem("nexo-currency", currency);
+  try {
+    await load();
+  } catch (error) {
+    notify(error.message, true);
+  }
+};
 function notify(message, error = false) {
   $("#toast").textContent = message;
   $("#toast").className = error ? "error" : "";
@@ -167,7 +179,12 @@ async function load() {
   const keys = ["products", "categories", "suppliers", "sales"];
   if (user.role === "ADMIN") keys.push("users");
   const values = await Promise.all(keys.map((k) => api(k)));
-  keys.forEach((k, i) => (data[k] = values[i]));
+  keys.forEach(
+    (k, i) =>
+      (data[k] = ["products", "sales"].includes(k)
+        ? values[i].filter((item) => item.currency === currency)
+        : values[i]),
+  );
   render();
 }
 function empty(message = "Agrega tu primer registro para comenzar.") {
@@ -193,6 +210,7 @@ function productRows(products) {
       esc(p.category.name),
       esc(p.supplier.name),
       money(p.price),
+      p.cost == null ? "Sin registrar" : money(p.cost),
       `<span class="pill ${p.stock <= p.minimumStock ? "low" : ""}">${p.stock} uds.</span>`,
       actions(p.id),
     ]),
@@ -234,7 +252,7 @@ function render() {
       )
       .join(
         "",
-      )}</section><section class="panel"><div class="panel-head"><div><h2>Productos que necesitan atención</h2><p class="muted">Mantén tus existencias al día.</p></div><button data-goto="products">Ver inventario →</button></div>${low.length ? table(["Producto", "Categoría", "Proveedor", "Precio", "Stock", ""], productRows(low)) : empty("No tienes productos con stock bajo.")}</section><section class="panel"><h2>Últimas ventas</h2>${salesTable([...data.sales].sort((a, b) => b.id - a.id).slice(0, 5))}</section>`;
+      )}</section><section class="panel"><div class="panel-head"><div><h2>Productos que necesitan atención</h2><p class="muted">Mantén tus existencias al día.</p></div><button data-goto="products">Ver inventario →</button></div>${low.length ? table(["Producto", "Categoría", "Proveedor", "Precio", "Costo", "Stock", ""], productRows(low)) : empty("No tienes productos con stock bajo.")}</section><section class="panel"><h2>Últimas ventas</h2>${salesTable([...data.sales].sort((a, b) => b.id - a.id).slice(0, 5))}</section>`;
     return;
   }
   $("#content").innerHTML =
@@ -253,7 +271,7 @@ function salesTable(sales) {
         `<strong>#${String(s.id).padStart(4, "0")}</strong>`,
         esc(
           new Date(s.createdAt).toLocaleString("es-CO", {
-            timeZone: "America/Bogota",
+            timeZone: currency === "PEN" ? "America/Lima" : "America/Bogota",
           }),
         ),
         esc(s.user.name),
@@ -277,6 +295,7 @@ function renderRecords() {
         "Categoría",
         "Proveedor",
         "Precio",
+        "Costo",
         "Stock",
         "Acciones",
       ],
@@ -393,6 +412,7 @@ function editor(item = {}) {
           ["name", "Nombre", "text", 150],
           ["sku", "SKU", "text", 60],
           ["price", "Precio de venta", "number"],
+          ["cost", "Costo unitario", "number"],
           ["stock", "Existencias", "number"],
           ["minimumStock", "Stock mínimo", "number"],
           ["categoryId", "Categoría", "select", data.categories],
@@ -426,7 +446,7 @@ function editor(item = {}) {
             : key === "supplierId"
               ? item.supplier?.id
               : "");
-        return `<label>${label}${type === "select" ? `<select name="${key}" required>${extra.map((o) => `<option value="${o.id}" ${Number(value) === o.id ? "selected" : ""}>${esc(o.name)}</option>`).join("")}</select>` : `<input name="${key}" type="${type}" value="${esc(value)}" ${["name", "sku", "price", "stock", "minimumStock"].includes(key) ? "required" : ""} ${type === "number" ? `min="${key === "price" ? ".01" : "0"}" max="${key === "price" ? "999999999.99" : "1000000"}" step="${key === "price" ? ".01" : "1"}"` : `maxlength="${extra}"`}>`}</label>`;
+        return `<label>${label}${type === "select" ? `<select name="${key}" required>${extra.map((o) => `<option value="${o.id}" ${Number(value) === o.id ? "selected" : ""}>${esc(o.name)}</option>`).join("")}</select>` : `<input name="${key}" type="${type}" value="${esc(value)}" ${["name", "sku", "price", "stock", "minimumStock"].includes(key) ? "required" : ""} ${type === "number" ? `min="${key === "price" ? ".01" : "0"}" max="${["price", "cost"].includes(key) ? "999999999.99" : "1000000"}" step="${["price", "cost"].includes(key) ? ".01" : "1"}"` : `maxlength="${extra}"`}>`}</label>`;
       })
       .join(
         "",
@@ -442,6 +462,10 @@ function editor(item = {}) {
         ["price", "stock", "minimumStock", "categoryId", "supplierId"].forEach(
           (k) => (values[k] = Number(values[k])),
         );
+      if (view === "products") {
+        values.currency = item.currency || currency;
+        values.cost = values.cost === "" ? null : Number(values.cost);
+      }
       await api(
         view + (item.id ? "/" + item.id : ""),
         item.id ? "PUT" : "POST",

@@ -56,9 +56,11 @@ class SecurityConfig {
       Users users,
       PasswordEncoder encoder,
       @Value("${app.admin.email}") String email,
-      @Value("${app.admin.password}") String password) {
+      @Value("${app.admin.password}") String password,
+      @Value("${app.seed.enabled:false}") boolean seedEnabled) {
     return args -> {
-      if (!email.isBlank()
+      if (!seedEnabled
+          && !email.isBlank()
           && !password.isBlank()
           && users.findByEmail(email.toLowerCase(java.util.Locale.ROOT)).isEmpty()) {
         if (password.length() < 12)

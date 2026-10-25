@@ -1,0 +1,28 @@
+# Archivo optativo: jamás se incluye en `docker compose up` normal.
+services:
+  seed:
+    image: eclipse-temurin:21-jre
+    profiles: [seed]
+    restart: "no"
+    read_only: true
+    tmpfs:
+      - /tmp
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./target/inventario-1.0.0.jar:/app/inventario.jar:ro
+    environment:
+      DB_URL: jdbc:mysql://db:3306/inventario
+      DB_USER: inventario
+      DB_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en .env}
+      NEXO_SEED_PASSWORD: ${NEXO_SEED_PASSWORD:?Define la contraseña demo en tu terminal}
+    command:
+      [
+        java,
+        -jar,
+        /app/inventario.jar,
+        --spring.profiles.active=dev,
+        --app.seed.enabled=true,
+        --server.port=0,
+      ]

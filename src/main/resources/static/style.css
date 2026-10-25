@@ -516,3 +516,18 @@ dialog::backdrop {
     flex-wrap: wrap;
   }
 }
+
+.currency-picker {
+  margin: 0 15px 0 auto;
+  min-width: 120px;
+}
+.currency-picker select {
+  padding: 8px;
+}
+@media (max-width: 700px) {
+  .currency-picker {
+    min-width: 100px;
+    margin-left: 8px;
+    max-width: 125px;
+  }
+}

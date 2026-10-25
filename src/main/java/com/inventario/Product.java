@@ -20,6 +20,12 @@ public class Product {
   @Column(nullable = false, precision = 14, scale = 2)
   public BigDecimal price;
 
+  @Column(precision = 14, scale = 2)
+  public BigDecimal cost;
+
+  @Column(nullable = false, length = 3)
+  public String currency = "PEN";
+
   public int stock;
   public int minimumStock;
 

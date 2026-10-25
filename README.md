@@ -28,7 +28,7 @@ El administrador inicial se crea únicamente cuando el correo configurado no exi
 - Transacciones y bloqueo pesimista de productos en orden estable: una venta concurrente no puede dejar stock negativo. Una venta fallida revierte todas sus líneas. Los productos repetidos en una venta se rechazan.
 - Las claves foráneas impiden borrar categorías/proveedores en uso o productos vendidos. Los nombres y precios de cada línea se conservan como datos históricos.
 
-La moneda de presentación es COP. Los indicadores monetarios usan precios de venta, no costos contables. No incluye pagos, impuestos, facturación fiscal ni recuperación de contraseña por correo.
+La moneda predeterminada para nuevos productos es PEN (soles); el selector permite consultar COP por separado, conservando el significado de los importes anteriores. Los indicadores monetarios usan precios de venta, no costos contables. No incluye pagos, impuestos, facturación fiscal ni recuperación de contraseña por correo.
 
 ## Modelo de datos
 
@@ -70,4 +70,8 @@ Con el servidor y MySQL iniciados: `npm ci`, `npx playwright install chromium` y
 
 Para repetir la suite Java con MySQL utiliza una **base exclusiva de pruebas** (la suite borra sus tablas entre casos): configura `TEST_DB_URL`, `TEST_DB_USER` y `TEST_DB_PASSWORD`, y ejecuta `./mvnw test`. Las variables son opcionales; por defecto usa H2 en memoria. No ejecutes esa suite contra una base con datos que quieras conservar.
 
-La instancia cloud incluye credenciales locales aleatorias en `.env`; puedes consultarlas de forma privada o configurar tus propios valores antes de crear una base nueva. `./scripts/cloud-setup.sh` prepara el JDK completo, Maven, dependencias y pruebas de manera repetible; conserva el `.env` existente. La aplicación usa la zona horaria America/Bogota para mostrar ventas.
+La instancia cloud incluye credenciales locales aleatorias en `.env`; puedes consultarlas de forma privada o configurar tus propios valores antes de crear una base nueva. `./scripts/cloud-setup.sh` prepara el JDK completo, Maven, dependencias y pruebas de manera repetible; conserva el `.env` existente. La aplicación muestra las ventas PEN en America/Lima y COP en America/Bogota.
+
+## Datos de prueba peruanos
+
+La carga explícita de desarrollo incluye **12 categorías, 20 proveedores, 150 productos con costos y precios en soles, 300 ventas históricas y 5 usuarios**. Es transaccional e idempotente, conserva registros existentes y rechaza producción. Consulta [las instrucciones completas para Windows, Docker y Spring Boot](docs/DATOS_DE_PRUEBA.md). No añadas el seed al arranque habitual.

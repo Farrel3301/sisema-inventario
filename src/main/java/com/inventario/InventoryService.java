@@ -41,6 +41,10 @@ class InventoryService {
               .locked(entry.getKey())
               .orElseThrow(
                   () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto inexistente"));
+      if (sale.items.isEmpty()) sale.currency = p.currency;
+      else if (!sale.currency.equals(p.currency))
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST, "No se pueden mezclar monedas en una venta");
       if (p.stock < entry.getValue())
         throw new ResponseStatusException(HttpStatus.CONFLICT, "Stock insuficiente: " + p.name);
       p.stock -= entry.getValue();
